@@ -1,10 +1,13 @@
-let anneeNaissance = prompt("Quelle est votre année de naissance ?");
+/* Toutes les variables */
+let li = document.querySelector("#listeCourses li");
 
-function calculAge(anneeNaissance) {
-    let age = 2026 - anneeNaissance;
-    return age;
-}
 
-let age = calculAge(anneeNaissance);
+/* Tous les évènements */
+li.addEventListener('click', () => {
+    li.style.backgroundColor = "lightblue";
+    li.style.textDecoration = "line-through";
+})
 
-alert(`Vous avez ${age} ans en 2026 !`);
+
+/* Les fonctions */
+// A voir plus tard
