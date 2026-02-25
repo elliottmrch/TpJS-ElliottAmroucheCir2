@@ -32,9 +32,7 @@ function addProduct() {
     let produit = myInput.value;
     if (produit == "") {
         alert("Erreur de saisie");
-    }
-    //pas de doublon (majuscule et minuscule sont la même chose)
-    else if (liste.innerHTML.toLowerCase().includes(produit.toLowerCase())) {
+    } else if (document.querySelectorAll("#listeCourses li").length > 0 && Array.from(document.querySelectorAll("#listeCourses li")).some(li => li.innerHTML.toLowerCase() === produit.toLowerCase())) {
         alert("Produit déjà dans la liste");
     } else {
         alert("Produit ajouté")
