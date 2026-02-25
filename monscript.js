@@ -33,7 +33,7 @@ function addProduct() {
     if (produit == "") {
         alert("Erreur de saisie");
     } else {
-        // alert("Produit ajouté")
+        alert("Produit ajouté")
         let nvLi = document.createElement("li");
         nvLi.innerHTML = produit;
         nvLi.addEventListener('click', () => {
@@ -41,5 +41,9 @@ function addProduct() {
         });
         liste.appendChild(nvLi);
         myInput.value = "";
+        nvLi.addEventListener('dblclick', () => {
+            nvLi.remove();
+            alert("Produit supprimé");
+        });
     }
 }
