@@ -1,65 +1,21 @@
-let number = 5;
-let text = '5';
-let isRainingToday = true;
+let i = 0;
+let result = 0;
+while (i < 100) {
+    i += 1;
+    result += i;
+}
+console.log(result);
 
-if (number == text) {
-    console.log("égal avec ==");
+
+let nbr = prompt("Entrer un nombre entre 1 et 100");
+if (nbr < 1 || nbr > 100 || isNaN(nbr)) {
+    console.log("Nombre invalide");
 } else {
-    console.log("pas égal avec ==");
-}
-
-if (number === text) {
-    console.log("égal avec ===");
-} else {
-    console.log("pas égal avec ===");
-}
-
-if (isRainingToday) {
-    console.log("Where is my umbrella?");
-}
-
-
-let age = prompt("Quel âge as-tu ?");
-
-// if (age > 0 && age < 18) {
-//     alert(`L’utilisateur a ${age} an(s), il est mineur!`);
-// } else if (age >= 18 && age < 62) {
-//     alert(`L’utilisateur a ${age} an(s), il est majeur!`);
-// } else if (age >= 62) {
-//     alert(`L’utilisateur a ${age} an(s), il est majeur mais aussi retraité !!`);
-// } else {
-//     alert("L'âge saisi n'est pas valide.");
-// }
-
-
-// if (age == 18) {
-//     alert("il vient d’être majeur");
-// } else if (age == 25) {
-//     alert("il a un quart de siècle");
-// } else if (age == 50) {
-//     alert("il a un demi siècle");
-// } else if (age == 62) {
-//     alert("il vient d’être à la retraite");
-// } else if (age == 100) {
-//     alert("il vient d’être centenaire");
-// }
-
-switch (age) {
-    case '18':
-        alert("il vient d’être majeur");
-        break;
-    case '25':
-        alert("il a un quart de siècle");
-        break;
-    case '50':
-        alert("il a un demi siècle");
-        break;
-    case '62':
-        alert("il vient d’être à la retraite");
-        break;
-    case '100':
-        alert("il vient d’être centenaire");
-        break;
-    default:
-        alert("Âge non spécial");
+    let i2 = 0;
+    let result2 = 0;
+    do {
+        i2 += 1;
+        result2 += i2;
+    } while (i2 < nbr);
+    console.log(result2);
 }
