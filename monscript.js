@@ -15,6 +15,22 @@ let liste = document.querySelector("#listeCourses");
 /* Tous les évènements */
 li.addEventListener('click', () => {
     li.classList.toggle("itemCheck");
+    saveList();
+})
+
+li.addEventListener('dblclick', () => {
+    if (li.innerText.includes("(x")) {
+        let parties = li.innerText.split(" (x");
+        let quantite = parseInt(parties[1]);
+        if (quantite > 2) {
+            li.innerText = parties[0] + " (x" + (quantite - 1) + ")";
+        } else {
+            li.innerText = parties[0];
+        }
+    } else {
+        li.remove();
+    }
+    saveList();
 })
 
 btn.addEventListener('click', () => {
@@ -47,12 +63,13 @@ function addProduct() {
             dejaDansLaListe = true;
 
             if (li.innerText.includes("(x")) {
-                let parties = li.innerText.split("(x");
+                let parties = li.innerText.split(" (x");
                 let quantiteActuelle = parseInt(parties[1]);
-                li.innerText = produit + " (x" + (quantiteActuelle + 1) + ")";
+                li.innerText = parties[0] + " (x" + (quantiteActuelle + 1) + ")";
             } else {
-                li.innerText = produit + " (x2)";
+                li.innerText = li.innerText + " (x2)";
             }
+            saveList();
         }
     }
 
@@ -62,14 +79,75 @@ function addProduct() {
 
         nvLi.addEventListener('click', () => {
             nvLi.classList.toggle("itemCheck");
+            saveList();
         });
 
         nvLi.addEventListener('dblclick', () => {
-            nvLi.remove();
+            if (nvLi.innerText.includes("(x")) {
+                let parties = nvLi.innerText.split(" (x");
+                let quantite = parseInt(parties[1]);
+                if (quantite > 2) {
+                    nvLi.innerText = parties[0] + " (x" + (quantite - 1) + ")";
+                } else {
+                    nvLi.innerText = parties[0];
+                }
+            } else {
+                nvLi.remove();
+            }
+            saveList();
         });
 
         liste.appendChild(nvLi);
+        saveList();
     }
 
     myInput.value = "";
 }
+
+function saveList() {
+    let items = [];
+    document.querySelectorAll("#listeCourses li").forEach(li => {
+        items.push({
+            texte: li.innerText,
+            checked: li.classList.contains("itemCheck")
+        });
+    });
+    localStorage.setItem("maListe", JSON.stringify(items));
+}
+
+function loadList() {
+    let donnees = localStorage.getItem("maListe");
+    if (!donnees) return;
+
+    let items = JSON.parse(donnees);
+    liste.innerHTML = "";
+
+    items.forEach(item => {
+        let nvLi = document.createElement("li");
+        nvLi.innerText = item.texte;
+        if (item.checked) nvLi.classList.add("itemCheck");
+
+        nvLi.addEventListener('click', () => {
+            nvLi.classList.toggle("itemCheck");
+            saveList();
+        });
+        nvLi.addEventListener('dblclick', () => {
+            if (nvLi.innerText.includes("(x")) {
+                let parties = nvLi.innerText.split(" (x");
+                let quantite = parseInt(parties[1]);
+                if (quantite > 2) {
+                    nvLi.innerText = parties[0] + " (x" + (quantite - 1) + ")";
+                } else {
+                    nvLi.innerText = parties[0];
+                }
+            } else {
+                nvLi.remove();
+            }
+            saveList();
+        });
+
+        liste.appendChild(nvLi);
+    });
+}
+
+loadList();
