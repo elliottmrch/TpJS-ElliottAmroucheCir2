@@ -29,23 +29,47 @@ myInput.addEventListener('keyup', (event) => {
 
 /* Les fonctions */
 function addProduct() {
-    let produit = myInput.value;
-    if (produit == "") {
+    let produit = myInput.value.trim();
+
+    if (produit === "") {
         alert("Erreur de saisie");
-    } else if (document.querySelectorAll("#listeCourses li").length > 0 && Array.from(document.querySelectorAll("#listeCourses li")).some(li => li.innerHTML.toLowerCase() === produit.toLowerCase())) {
-        alert("Produit déjà dans la liste");
-    } else {
-        alert("Produit ajouté")
+        return;
+    }
+
+    let toutesLesLignes = document.querySelectorAll("#listeCourses li");
+    let dejaDansLaListe = false;
+
+    for (let li of toutesLesLignes) {
+        let texteMinuscule = li.innerText.toLowerCase();
+        let produitMinuscule = produit.toLowerCase();
+
+        if (texteMinuscule === produitMinuscule || texteMinuscule.startsWith(produitMinuscule + " (x")) {
+            dejaDansLaListe = true;
+
+            if (li.innerText.includes("(x")) {
+                let parties = li.innerText.split("(x");
+                let quantiteActuelle = parseInt(parties[1]);
+                li.innerText = produit + " (x" + (quantiteActuelle + 1) + ")";
+            } else {
+                li.innerText = produit + " (x2)";
+            }
+        }
+    }
+
+    if (!dejaDansLaListe) {
         let nvLi = document.createElement("li");
-        nvLi.innerHTML = produit;
+        nvLi.innerText = produit;
+
         nvLi.addEventListener('click', () => {
             nvLi.classList.toggle("itemCheck");
         });
-        liste.appendChild(nvLi);
-        myInput.value = "";
+
         nvLi.addEventListener('dblclick', () => {
             nvLi.remove();
-            alert("Produit supprimé");
         });
+
+        liste.appendChild(nvLi);
     }
+
+    myInput.value = "";
 }
