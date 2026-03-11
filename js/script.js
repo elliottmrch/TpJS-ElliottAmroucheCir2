@@ -14,7 +14,11 @@ myInput.addEventListener('change', (event) => {
 });
 
 async function loadData(numGeneration = 1) {
-    const data = await fetch(`https://pokebuildapi.fr/api/v1/pokemon/generation/${numGeneration}`)
+    // const data = await fetch(`https://pokebuildapi.fr/api/v1/pokemon/generation/${numGeneration}`)
+    //     .then(response => response.json())
+    //     .catch(error => alert("Erreur : " + error));
+    
+    const data = await fetch(`https://tyradex.app/api/v1/gen/${numGeneration}`)
         .then(response => response.json())
         .catch(error => alert("Erreur : " + error));
 
@@ -26,24 +30,24 @@ async function loadData(numGeneration = 1) {
         article.innerHTML = `
                 <figure>
                     <picture>
-                        <img alt="Image ${data[i].name}"
-                             src="${data[i].image}"/>
+                        <img alt="Image ${data[i].name.fr}" 
+                             src="${data[i].sprites.regular}"/>
                     </picture>
                     <figcaption>
-                        <span class="types">${data[i].apiTypes.map(t => t.name).join(' / ')}</span>
-                        <h2>${data[i].name}</h2>
+                        <span class="types">${data[i].types.map(t => t.name).join(' / ')}</span>
+                        <h2>${data[i].name.fr}</h2>
                         <ol>
-                            <li>Points de vie : ${data[i].stats.HP}</li>
-                            <li>Attaque : ${data[i].stats.attack}</li>
-                            <li>Défense : ${data[i].stats.defense}</li>
-                            <li>Attaque spécial : ${data[i].stats.special_attack}</li>
-                            <li>Vitesse : ${data[i].stats.speed}</li>
+                            <li>Points de vie : ${data[i].stats.hp}</li>
+                            <li>Attaque : ${data[i].stats.atk}</li>
+                            <li>Défense : ${data[i].stats.def}</li>
+                            <li>Attaque spécial : ${data[i].stats.spe_atk}</li>
+                            <li>Vitesse : ${data[i].stats.vit}</li>
                         </ol>
                     </figcaption>
                 </figure>
     `;
 
-        switch (data[i].apiTypes[0].name) {
+        switch (data[i].types[0].name) {
             case "Plante":
                 article.style.backgroundColor = "#78C850";
                 article.style.border = "#78C850 solid 10px";
