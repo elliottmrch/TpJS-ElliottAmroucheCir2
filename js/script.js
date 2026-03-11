@@ -4,25 +4,80 @@
 
 let main = document.querySelector("main");
 let myInput = document.querySelector("select");
+let types = document.querySelector("#types");
+let sortInput = document.querySelector("#select-tri");
 
+let selectedType = null;
+
+loadTypes();
 loadData(1);
+
 myInput.addEventListener('change', (event) => {
-    console.log(myInput.value);
     let numGeneration = event.target.value;
     main.innerHTML = "";
     loadData(numGeneration);
 });
 
-async function loadData(numGeneration = 1) {
+sortInput.addEventListener('change', () => {
+    main.innerHTML = "";
+    loadData(myInput.value, selectedType);
+});
+
+async function loadTypes() {
+    const data = await fetch(`https://tyradex.app/api/v1/types`)
+        .then(response => response.json())
+        .catch(error => console.log("Erreur : " + error));
+
+    types.innerHTML = "";
+
+    data.forEach(type => {
+        let typeName = type.name.fr;
+        let typeImg = type.sprites;
+
+        if (typeImg) {
+            let typeDiv = document.createElement("div");
+            typeDiv.innerHTML = `<img alt="${typeName}" src="${typeImg}">`;
+
+            typeDiv.addEventListener("click", () => {
+                if (selectedType === typeName) {
+                    selectedType = null;
+                } else {
+                    selectedType = typeName;
+                }
+
+                main.innerHTML = "";
+
+                loadData(myInput.value, selectedType);
+            });
+
+            types.appendChild(typeDiv);
+        }
+    });
+}
+
+async function loadData(numGeneration = 1, typeFilter = null) {
     // const data = await fetch(`https://pokebuildapi.fr/api/v1/pokemon/generation/${numGeneration}`)
     //     .then(response => response.json())
     //     .catch(error => alert("Erreur : " + error));
-    
-    const data = await fetch(`https://tyradex.app/api/v1/gen/${numGeneration}`)
+
+    let data = await fetch(`https://tyradex.app/api/v1/gen/${numGeneration}`)
         .then(response => response.json())
         .catch(error => alert("Erreur : " + error));
 
-    console.log(data);
+    if (typeFilter !== null) {
+        data = data.filter(pokemon => pokemon.types.some(t => t.name === typeFilter))
+    }
+
+    let sortBy = sortInput.value;
+    if (sortBy === "name") {
+        data.sort((a, b) => a.name.fr.localeCompare(b.name.fr));
+    } else if (sortBy === "hp") {
+        data.sort((a, b) => b.stats.hp - a.stats.hp);
+    } else if (sortBy === "attack") {
+        data.sort((a, b) => b.stats.atk - a.stats.atk);
+    } else if (sortBy === "type") {
+        data.sort((a, b) => a.types[0].name.localeCompare(b.types[0].name));
+    }
 
     for (let i = 0; i < data.length; i++) {
         let article = document.createElement("article");

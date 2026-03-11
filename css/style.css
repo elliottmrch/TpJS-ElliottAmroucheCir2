@@ -133,16 +133,16 @@ select {
     flex-direction: row;
     flex-wrap: wrap;
     margin: 5%;
-    width: 800px;
+    width: 90%;
 }
 
 #types > div {
-    width: 60px;
+    width: 25px;
     padding: 20px;
     text-align: center;
     background-color: #fff;
     border-radius: 170px;
-    height: 60px;
+    height: 25px;
     margin: 5px;
 }
 
