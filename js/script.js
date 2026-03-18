@@ -1,13 +1,108 @@
-// const data = await fetch("./data/data.json")
-//     .then(response => response.json())
-//     .catch(error => alert("Erreur : " + error));
-
 let main = document.querySelector("main");
 let myInput = document.querySelector("select");
 let types = document.querySelector("#types");
 let sortInput = document.querySelector("#select-tri");
 
 let selectedType = null;
+
+class Type {
+    constructor(data) {
+        this.name = data.name;
+        this.image = data.image;
+        this.color = this.getColorHexa();
+    }
+
+    getColorHexa() {
+        switch (this.name) {
+            case "Plante":
+                return "#78C850";
+            case "Feu":
+                return "#F08030";
+            case "Eau":
+                return "#6890F0";
+            case "Insecte":
+                return "#A8B820";
+            case "Normal":
+                return "#A8A878";
+            case "Poison":
+                return "#A040A0";
+            case "Électrik":
+                return "#F8D030";
+            case "Sol":
+                return "#E0C068";
+            case "Fée":
+                return "#EE99AC";
+            case "Combat":
+                return "#C03028";
+            case "Psy":
+                return "#F85888";
+            case "Roche":
+                return "#B8A038";
+            case "Spectre":
+                return "#705898";
+            case "Glace":
+                return "#98D8D8";
+            case "Dragon":
+                return "#7038F8";
+            case "Acier":
+                return "#B8B8D0";
+            case "Ténèbres":
+                return "#705848";
+            case "Vol":
+                return "#A890F0";
+            default:
+                return "lightgray";
+        }
+    }
+}
+
+class Pokemon {
+    constructor(data) {
+        this.id = data.pokedex_id;
+        this.name = data.name.fr;
+        this.image = data.sprites.regular;
+
+        this.apiTypes = data.types ? data.types.map(t => new Type(t)) : [];
+
+        this.hp = data.stats.hp;
+        this.attack = data.stats.atk;
+        this.defense = data.stats.def;
+        this.special_attack = data.stats.spe_atk;
+        this.speed = data.stats.vit;
+    }
+
+    displayCard() {
+        let article = document.createElement("article");
+
+        let mainColor = this.apiTypes.length > 0 ? this.apiTypes[0].color : "lightgray";
+
+        article.style.backgroundColor = mainColor;
+        article.style.border = `${mainColor} solid 10px`;
+
+        let typesString = this.apiTypes.map(t => t.name).join(' / ');
+
+        article.innerHTML = `
+            <figure>
+                <picture>
+                    <img alt="Image ${this.name}" src="${this.image}"/>
+                </picture>
+                <figcaption>
+                    <span class="types">${typesString}</span>
+                    <h2>${this.name}</h2>
+                    <ol>
+                        <li>Points de vie : ${this.hp}</li>
+                        <li>Attaque : ${this.attack}</li>
+                        <li>Défense : ${this.defense}</li>
+                        <li>Attaque spécial : ${this.special_attack}</li>
+                        <li>Vitesse : ${this.speed}</li>
+                    </ol>
+                </figcaption>
+            </figure>
+        `;
+
+        return article;
+    }
+}
 
 loadTypes();
 loadData(1);
@@ -39,14 +134,8 @@ async function loadTypes() {
             typeDiv.innerHTML = `<img alt="${typeName}" src="${typeImg}">`;
 
             typeDiv.addEventListener("click", () => {
-                if (selectedType === typeName) {
-                    selectedType = null;
-                } else {
-                    selectedType = typeName;
-                }
-
+                selectedType = (selectedType === typeName) ? null : typeName;
                 main.innerHTML = "";
-
                 loadData(myInput.value, selectedType);
             });
 
@@ -56,130 +145,28 @@ async function loadTypes() {
 }
 
 async function loadData(numGeneration = 1, typeFilter = null) {
-    // const data = await fetch(`https://pokebuildapi.fr/api/v1/pokemon/generation/${numGeneration}`)
-    //     .then(response => response.json())
-    //     .catch(error => alert("Erreur : " + error));
-
-    let data = await fetch(`https://tyradex.app/api/v1/gen/${numGeneration}`)
+    let rawData = await fetch(`https://tyradex.app/api/v1/gen/${numGeneration}`)
         .then(response => response.json())
         .catch(error => alert("Erreur : " + error));
 
+    let pokemons = rawData.map(data => new Pokemon(data));
+
     if (typeFilter !== null) {
-        data = data.filter(pokemon => pokemon.types.some(t => t.name === typeFilter))
+        pokemons = pokemons.filter(pokemon => pokemon.apiTypes.some(t => t.name === typeFilter));
     }
 
     let sortBy = sortInput.value;
     if (sortBy === "name") {
-        data.sort((a, b) => a.name.fr.localeCompare(b.name.fr));
+        pokemons.sort((a, b) => a.name.localeCompare(b.name));
     } else if (sortBy === "hp") {
-        data.sort((a, b) => b.stats.hp - a.stats.hp);
+        pokemons.sort((a, b) => b.hp - a.hp);
     } else if (sortBy === "attack") {
-        data.sort((a, b) => b.stats.atk - a.stats.atk);
+        pokemons.sort((a, b) => b.attack - a.attack);
     } else if (sortBy === "type") {
-        data.sort((a, b) => a.types[0].name.localeCompare(b.types[0].name));
+        pokemons.sort((a, b) => a.apiTypes[0].name.localeCompare(b.apiTypes[0].name));
     }
 
-    for (let i = 0; i < data.length; i++) {
-        let article = document.createElement("article");
-
-        article.innerHTML = `
-                <figure>
-                    <picture>
-                        <img alt="Image ${data[i].name.fr}" 
-                             src="${data[i].sprites.regular}"/>
-                    </picture>
-                    <figcaption>
-                        <span class="types">${data[i].types.map(t => t.name).join(' / ')}</span>
-                        <h2>${data[i].name.fr}</h2>
-                        <ol>
-                            <li>Points de vie : ${data[i].stats.hp}</li>
-                            <li>Attaque : ${data[i].stats.atk}</li>
-                            <li>Défense : ${data[i].stats.def}</li>
-                            <li>Attaque spécial : ${data[i].stats.spe_atk}</li>
-                            <li>Vitesse : ${data[i].stats.vit}</li>
-                        </ol>
-                    </figcaption>
-                </figure>
-    `;
-
-        switch (data[i].types[0].name) {
-            case "Plante":
-                article.style.backgroundColor = "#78C850";
-                article.style.border = "#78C850 solid 10px";
-                break;
-            case "Feu":
-                article.style.backgroundColor = "#F08030";
-                article.style.border = "#F08030 solid 10px";
-                break;
-            case "Eau":
-                article.style.backgroundColor = "#6890F0";
-                article.style.border = "#6890F0 solid 10px";
-                break;
-            case "Insecte":
-                article.style.backgroundColor = "#A8B820";
-                article.style.border = "#A8B820 solid 10px";
-                break;
-            case "Normal":
-                article.style.backgroundColor = "#A8A878";
-                article.style.border = "#A8A878 solid 10px";
-                break;
-            case "Poison":
-                article.style.backgroundColor = "#A040A0";
-                article.style.border = "#A040A0 solid 10px";
-                break;
-            case "Électrik":
-                article.style.backgroundColor = "#F8D030";
-                article.style.border = "#F8D030 solid 10px";
-                break;
-            case "Sol":
-                article.style.backgroundColor = "#E0C068";
-                article.style.border = "#E0C068 solid 10px";
-                break;
-            case "Fée":
-                article.style.backgroundColor = "#EE99AC";
-                article.style.border = "#EE99AC solid 10px";
-                break;
-            case "Combat":
-                article.style.backgroundColor = "#C03028";
-                article.style.border = "#C03028 solid 10px";
-                break;
-            case "Psy":
-                article.style.backgroundColor = "#F85888";
-                article.style.border = "#F85888 solid 10px";
-                break;
-            case "Roche":
-                article.style.backgroundColor = "#B8A038";
-                article.style.border = "#B8A038 solid 10px";
-                break;
-            case "Spectre":
-                article.style.backgroundColor = "#705898";
-                article.style.border = "#705898 solid 10px";
-                break;
-            case "Glace":
-                article.style.backgroundColor = "#98D8D8";
-                article.style.border = "#98D8D8 solid 10px";
-                break;
-            case "Dragon":
-                article.style.backgroundColor = "#7038F8";
-                article.style.border = "#7038F8 solid 10px";
-                break;
-            case "Acier":
-                article.style.backgroundColor = "#B8B8D0";
-                article.style.border = "#B8B8D0 solid 10px";
-                break;
-            case "Ténèbres":
-                article.style.backgroundColor = "#705848";
-                article.style.border = "#705848 solid 10px";
-                break;
-            case "Vol":
-                article.style.backgroundColor = "#A890F0";
-                article.style.border = "#A890F0 solid 10px";
-                break;
-            default:
-                article.style.backgroundColor = "lightgray";
-                article.style.border = "lightgray solid 10px";
-        }
-
-        main.appendChild(article);
-    }
+    pokemons.forEach(pokemon => {
+        main.appendChild(pokemon.displayCard());
+    });
 }
